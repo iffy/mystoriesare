@@ -53,9 +53,11 @@ if ($result->num_rows > 0) {
                                 echo "<td class='z'>Email</td>";
                                 echo "</tr>";
                                 while($row = mysqli_fetch_assoc($result)) {
+                                        $st_name = $row['st_name'];
+                                        $email = $row['email'];
                                 echo "<tr>";
-                                echo "<td class='b'>".$row['st_name']."</td>";
-                                echo "<td><input type='checkbox' class='checkboxes' value='$row[st_id],$row[g_id]' >" .$row['email']."</td>";
+                                echo "<td class='b'>".$st_name."</td>";
+                                echo "<td><input type='checkbox' name='checkbox[]' class='checkboxes' value='$row[st_id],$row[g_id]' >" .$email."</td>";
                                 echo "</tr>";
                                 };
                                 echo "<br>";
