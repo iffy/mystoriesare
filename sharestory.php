@@ -16,15 +16,11 @@ $sql = "SELECT * FROM users WHERE id = $_SESSION[id] ";
 $result = mysqli_query($db, $sql);
 
 if ($result->num_rows > 0) {
-    while($row = $result->fetch_assoc()) {
-    $username = $row["username"];
-    $password = $row["password"];
-    $fname     = $row["fname"];
-    $lname     = $row["lname"];
-    $email     = $row["email"];
-
+    while ($row = $result->fetch_assoc()) {
+        $username = $row["username"];
+        $fname    = $row["fname"];
     }
-    }
+}
 
 ?>
     <div class="main">
@@ -51,7 +47,7 @@ if ($result->num_rows > 0) {
             echo "<td class='z'>Story Name</td>";
             echo "</tr>";
 
-                $sql = ("SELECT * FROM gs WHERE id = $_SESSION[id] ");
+                $sql = ("SELECT * FROM gs WHERE id = $id");
                 $result = mysqli_query($db, $sql);
 
                 while($row = mysqli_fetch_array($result)) {
@@ -70,7 +66,26 @@ if ($result->num_rows > 0) {
         echo "<br>";
         echo "<br>";
 
-        $sql = ("SELECT * FROM guest, story WHERE guest.userid = story.userid AND guest.userid = $_SESSION[id] ORDER BY story.st_name  ");
+        $sql = ("SELECT
+                    story.st_name,
+                    story.st_id,
+                    guest.g_id,
+                    guest.email,
+                    guest.first_name,
+                    guest.last_name,
+                    gs.id as already_shared
+                FROM
+                    guest,
+                    story
+                    LEFT JOIN gs
+                        ON gs.id = $id
+                        AND gs.st_id = story.st_id
+                        AND gs.guest_id = guest.g_id
+                WHERE
+                    story.userid = $id
+                    AND guest.userid = $id
+                    AND 
+                ORDER BY story.st_name");
         $result = mysqli_query($db, $sql);
 
         echo "<table class='p'>";
@@ -86,11 +101,14 @@ if ($result->num_rows > 0) {
                     $g_id       = $row['g_id'];
                     $first_name = $row['first_name'];
                     $last_name  = $row['last_name'];
+                    $already_shared = $row['already_shared'];
 
-                    echo "<tr>";
-                    echo "<td class='b'>".$st_name."</td>";
-                    echo "<td><input type='checkbox' name='checkbox[]' class='checkboxes' value='$row[st_id],$row[g_id],$row[first_name],$row[last_name],$row[st_name]' >".$email."</td>";
-                    echo "</tr>";
+                    if (is_null($already_shared)) {
+                        echo "<tr>";
+                        echo "<td class='b'>".$st_name."</td>";
+                        echo "<td><input type='checkbox' name='checkbox[]' class='checkboxes' value='$row[st_id],$row[g_id],$row[first_name],$row[last_name],$row[st_name]' >".$email."</td>";
+                        echo "</tr>";
+                    }
                 }
 
         echo "<br>";
@@ -109,3 +127,4 @@ if ($result->num_rows > 0) {
 
 <div class="footer">
 <?php include 'private/footer.php';?>
+
